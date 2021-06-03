@@ -37,8 +37,8 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           InkWell(
             onTap: (){
-              ElasticDrawerKey.drawer.currentState.closeElasticDrawer(context);
-              ElasticDrawerKey.navigator.currentState.push(
+              ElasticDrawerKey.drawer.currentState!.closeElasticDrawer(context);
+              ElasticDrawerKey.navigator.currentState!.push(
                   MaterialPageRoute(
                       builder: (context) => YellowPage()
                   )
@@ -55,8 +55,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           InkWell(
             onTap: (){
-              ElasticDrawerKey.drawer.currentState.closeElasticDrawer(context);
-              ElasticDrawerKey.navigator.currentState.push(
+              ElasticDrawerKey.drawer.currentState!.closeElasticDrawer(context);
+              ElasticDrawerKey.navigator.currentState!.push(
                   MaterialPageRoute(
                       builder: (context) => GreenPage()
                   )
@@ -73,8 +73,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           InkWell(
             onTap: (){
-              ElasticDrawerKey.drawer.currentState.closeElasticDrawer(context);
-              ElasticDrawerKey.navigator.currentState.push(
+              ElasticDrawerKey.drawer.currentState!.closeElasticDrawer(context);
+              ElasticDrawerKey.navigator.currentState!.push(
                   MaterialPageRoute(
                       builder: (context) => RedPage()
                   )

@@ -19,20 +19,19 @@ class ElasticDrawer extends StatefulWidget {
   final Widget drawerChild;
 
   ElasticDrawer({
-    @required this.mainChild,
-    @required this.drawerChild,
+    required this.mainChild,
+    required this.drawerChild,
     this.mainColor = Colors.white,
     this.drawerColor = Colors.blue
-  }) : assert(mainChild != null),
-       assert(drawerChild != null);
+  }) ;
 
   @override
   _ElasticDrawerState createState() => _ElasticDrawerState();
 }
 
 class _ElasticDrawerState extends State<ElasticDrawer> with TickerProviderStateMixin{
-  AnimationController _animationController;
-  Offset _touchPosition;
+  late AnimationController _animationController;
+  Offset? _touchPosition;
   bool _slideOn = false;
 
   @override
@@ -49,7 +48,7 @@ class _ElasticDrawerState extends State<ElasticDrawer> with TickerProviderStateM
 
   closeElasticDrawer(BuildContext context){
     final size = MediaQuery.of(context).size;
-    if(_animationController.isCompleted && size != null){
+    if(_animationController.isCompleted){
       _touchPosition = Offset(size.width-20.0, size.height/2);
       _animationController.reverse().then((value) => {
         setState(() {
@@ -159,7 +158,7 @@ class _ElasticDrawerState extends State<ElasticDrawer> with TickerProviderStateM
 }
 
 class _CustomClipper extends CustomClipper<Path> {
-  Offset _touchPosition;
+  Offset? _touchPosition;
   double _endPosition;
 
   _CustomClipper(this._touchPosition, this._endPosition);
@@ -172,7 +171,7 @@ class _CustomClipper extends CustomClipper<Path> {
     path.lineTo(size.width, 0);
     path.lineTo(size.width, size.height);
     path.lineTo(size.width-10-size.width*_endPosition, size.height);
-    path.cubicTo(_touchPosition.dx, _touchPosition.dy, _touchPosition.dx, _touchPosition.dy, size.width-10-size.width*_endPosition, 0);
+    path.cubicTo(_touchPosition!.dx, _touchPosition!.dy, _touchPosition!.dx, _touchPosition!.dy, size.width-10-size.width*_endPosition, 0);
     path.close();
     return path;
   }
