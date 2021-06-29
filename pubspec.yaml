@@ -1,6 +1,6 @@
 name: elastic_drawer
 description: Elastic Drawer - elastic panel that slides in horizontally to show fully customize content (navigation links, menu items, notes etc.)
-version: 2.0.0
+version: 2.0.1
 author: Sergiy Nevedomyy<nevedomyy@gmail.com>
 homepage: https://github.com/nevedomyy/elastic_drawer.git
 

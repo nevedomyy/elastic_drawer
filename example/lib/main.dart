@@ -36,55 +36,55 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           InkWell(
-            onTap: (){
+            onTap: () {
               ElasticDrawerKey.drawer.currentState!.closeElasticDrawer(context);
-              ElasticDrawerKey.navigator.currentState!.push(
-                  MaterialPageRoute(
-                      builder: (context) => YellowPage()
-                  )
-              );
+              ElasticDrawerKey.navigator.currentState!
+                  .push(MaterialPageRoute(builder: (context) => YellowPage()));
             },
             child: Padding(
               padding: EdgeInsets.all(16.0),
               child: Text(
                 'YELLOW page',
-                style: TextStyle(color: Color(0xfff4c20d), fontSize: 30, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    color: Color(0xfff4c20d),
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
             ),
           ),
           InkWell(
-            onTap: (){
+            onTap: () {
               ElasticDrawerKey.drawer.currentState!.closeElasticDrawer(context);
-              ElasticDrawerKey.navigator.currentState!.push(
-                  MaterialPageRoute(
-                      builder: (context) => GreenPage()
-                  )
-              );
+              ElasticDrawerKey.navigator.currentState!
+                  .push(MaterialPageRoute(builder: (context) => GreenPage()));
             },
             child: Padding(
               padding: EdgeInsets.all(16.0),
               child: Text(
                 'GREEN page',
-                style: TextStyle(color: Color(0xff3cba54), fontSize: 30, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    color: Color(0xff3cba54),
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
             ),
           ),
           InkWell(
-            onTap: (){
+            onTap: () {
               ElasticDrawerKey.drawer.currentState!.closeElasticDrawer(context);
-              ElasticDrawerKey.navigator.currentState!.push(
-                  MaterialPageRoute(
-                      builder: (context) => RedPage()
-                  )
-              );
+              ElasticDrawerKey.navigator.currentState!
+                  .push(MaterialPageRoute(builder: (context) => RedPage()));
             },
             child: Padding(
               padding: EdgeInsets.all(16.0),
               child: Text(
                 'RED page',
-                style: TextStyle(color: Color(0xffdb3236), fontSize: 30, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    color: Color(0xffdb3236),
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -95,21 +95,21 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class GreenPage extends StatelessWidget{
+class GreenPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(color: Color(0xff3cba54));
   }
 }
 
-class YellowPage extends StatelessWidget{
+class YellowPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(color: Color(0xfff4c20d));
   }
 }
 
-class RedPage extends StatelessWidget{
+class RedPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(color: Color(0xffdb3236));
