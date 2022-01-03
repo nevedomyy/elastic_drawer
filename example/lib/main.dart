@@ -2,19 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:elastic_drawer/elastic_drawer.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({Key? key}) : super(key: key);
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -24,8 +28,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return ElasticDrawer(
       mainColor: Colors.white,
-      drawerColor: Color(0xff3C3F41),
-      mainChild: Center(
+      drawerColor: const Color(0xff3C3F41),
+      mainChild: const Center(
         child: Text(
           'MAIN page',
           style: TextStyle(color: Colors.black54, fontSize: 30),
@@ -37,11 +41,11 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           InkWell(
             onTap: () {
-              ElasticDrawerKey.drawer.currentState!.closeElasticDrawer(context);
-              ElasticDrawerKey.navigator.currentState!
-                  .push(MaterialPageRoute(builder: (context) => YellowPage()));
+              ElasticDrawerKey.drawer.currentState?.closeElasticDrawer(context);
+              ElasticDrawerKey.navigator.currentState?.push(
+                  MaterialPageRoute(builder: (context) => const YellowPage()));
             },
-            child: Padding(
+            child: const Padding(
               padding: EdgeInsets.all(16.0),
               child: Text(
                 'YELLOW page',
@@ -55,11 +59,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           InkWell(
             onTap: () {
-              ElasticDrawerKey.drawer.currentState!.closeElasticDrawer(context);
-              ElasticDrawerKey.navigator.currentState!
-                  .push(MaterialPageRoute(builder: (context) => GreenPage()));
+              ElasticDrawerKey.drawer.currentState?.closeElasticDrawer(context);
+              ElasticDrawerKey.navigator.currentState?.push(
+                  MaterialPageRoute(builder: (context) => const GreenPage()));
             },
-            child: Padding(
+            child: const Padding(
               padding: EdgeInsets.all(16.0),
               child: Text(
                 'GREEN page',
@@ -73,11 +77,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           InkWell(
             onTap: () {
-              ElasticDrawerKey.drawer.currentState!.closeElasticDrawer(context);
-              ElasticDrawerKey.navigator.currentState!
-                  .push(MaterialPageRoute(builder: (context) => RedPage()));
+              ElasticDrawerKey.drawer.currentState?.closeElasticDrawer(context);
+              ElasticDrawerKey.navigator.currentState?.push(
+                  MaterialPageRoute(builder: (context) => const RedPage()));
             },
-            child: Padding(
+            child: const Padding(
               padding: EdgeInsets.all(16.0),
               child: Text(
                 'RED page',
@@ -96,22 +100,28 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class GreenPage extends StatelessWidget {
+  const GreenPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return Container(color: Color(0xff3cba54));
+    return Container(color: const Color(0xff3cba54));
   }
 }
 
 class YellowPage extends StatelessWidget {
+  const YellowPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return Container(color: Color(0xfff4c20d));
+    return Container(color: const Color(0xfff4c20d));
   }
 }
 
 class RedPage extends StatelessWidget {
+  const RedPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return Container(color: Color(0xffdb3236));
+    return Container(color: const Color(0xffdb3236));
   }
 }

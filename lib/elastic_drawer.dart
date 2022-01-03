@@ -2,14 +2,17 @@ library elastic_drawer;
 
 import 'package:flutter/material.dart';
 
+const borderWidth = 20.0;
+const lineWidth = 10.0;
+const touchWidth = 20.0;
+const touchRadius = 40.0;
+
 class ElasticDrawerKey {
   static final drawer = GlobalKey<_ElasticDrawerState>();
   static final navigator = GlobalKey<NavigatorState>();
 }
 
 class ElasticDrawer extends StatefulWidget {
-  final Key key = ElasticDrawerKey.drawer;
-
   /// Color of main page
   final Color mainColor;
 
@@ -22,11 +25,20 @@ class ElasticDrawer extends StatefulWidget {
   /// Content inside drawer page
   final Widget drawerChild;
 
-  ElasticDrawer(
-      {required this.mainChild,
-      required this.drawerChild,
-      this.mainColor = Colors.white,
-      this.drawerColor = Colors.blue});
+  /// Width of touch mark (0..1)
+  final double markWidth;
+
+  /// Vertical position of touch mark (0..1)
+  final double markPosition;
+
+  ElasticDrawer({
+    required this.mainChild,
+    required this.drawerChild,
+    this.mainColor = Colors.white,
+    this.drawerColor = Colors.blue,
+    this.markWidth = 1,
+    this.markPosition = 0.95,
+  }) : super(key: ElasticDrawerKey.drawer);
 
   @override
   _ElasticDrawerState createState() => _ElasticDrawerState();
@@ -34,87 +46,129 @@ class ElasticDrawer extends StatefulWidget {
 
 class _ElasticDrawerState extends State<ElasticDrawer>
     with TickerProviderStateMixin {
-  late AnimationController _animationController;
-  Offset? _touchPosition;
+  late final AnimationController _animationController;
+  late final Animation<double> _clipperAnimation;
+  late final Animation<Offset> _firstAnimation;
+  late final Animation<Offset> _secondAnimation;
+  bool _isDrawerActive = false;
   bool _slideOn = false;
+  Offset? _touchPosition;
 
   @override
   void initState() {
     super.initState();
-    _animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _clipperAnimation = Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        curve: Curves.elasticOut,
+        reverseCurve: Curves.elasticIn,
+        parent: _animationController,
+      ),
+    );
+    _firstAnimation = Tween(
+      begin: const Offset(-1, 0),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        curve: Curves.linear,
+        parent: _animationController,
+      ),
+    );
+    _secondAnimation = Tween(
+      begin: Offset.zero,
+      end: const Offset(1, 0),
+    ).animate(
+      CurvedAnimation(
+        curve: Curves.linear,
+        parent: _animationController,
+      ),
+    );
   }
 
   @override
   void dispose() {
-    super.dispose();
     _animationController.dispose();
+    super.dispose();
   }
 
   closeElasticDrawer(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     if (_animationController.isCompleted) {
-      _touchPosition = Offset(size.width - 20.0, size.height / 2);
-      _animationController.reverse().then((value) => {
-            setState(() {
-              _touchPosition = Offset(20.0, size.height / 2);
-              _slideOn = false;
-            })
-          });
+      _animation(context);
     }
+  }
+
+  void _animation(BuildContext context) {
+    _isDrawerActive = false;
+    final size = MediaQuery.of(context).size;
+    final markPosition = touchRadius +
+        widget.markPosition.clamp(0, 1) * (size.height - 2 * touchRadius);
+    _touchPosition = Offset(size.width - borderWidth, markPosition);
+    _animationController.reverse().then((_) => {
+          setState(() {
+            _touchPosition = Offset(borderWidth, markPosition);
+            _slideOn = false;
+          })
+        });
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final markWidth = widget.markWidth.clamp(0, 1) * touchWidth;
+    final markPosition = touchRadius +
+        widget.markPosition.clamp(0, 1) * (size.height - 2 * touchRadius);
+
     return Stack(
-      children: <Widget>[
-        SizedBox(
-          width: size.width,
-          height: size.height,
+      children: [
+        SizedBox.fromSize(
+          size: size,
           child: Scaffold(
             backgroundColor: widget.mainColor,
             body: Navigator(
-                key: ElasticDrawerKey.navigator,
-                onGenerateRoute: (settings) =>
-                    MaterialPageRoute(builder: (context) => widget.mainChild)),
+              key: ElasticDrawerKey.navigator,
+              onGenerateRoute: (_) =>
+                  MaterialPageRoute(builder: (_) => widget.mainChild),
+            ),
           ),
         ),
         Align(
           alignment: Alignment.centerRight,
           child: SizedBox(
-            width: _slideOn ? size.width - 10.0 : 30.0,
+            width: _slideOn ? size.width - lineWidth : lineWidth + borderWidth,
             height: size.height,
             child: AnimatedBuilder(
               animation: _animationController,
               builder: (context, child) {
                 return ClipPath(
                   clipper: _CustomClipper(
-                      _touchPosition,
-                      Tween(begin: 0.0, end: 1.0)
-                          .animate(CurvedAnimation(
-                              curve: Curves.elasticOut,
-                              reverseCurve: Curves.elasticIn,
-                              parent: _animationController))
-                          .value),
+                    _touchPosition,
+                    markWidth,
+                    markPosition,
+                    _clipperAnimation.value,
+                    _isDrawerActive,
+                  ),
                   child: Scaffold(
-                      backgroundColor: widget.drawerColor,
-                      body: _slideOn ? widget.drawerChild : Container()),
+                    backgroundColor: widget.drawerColor,
+                    body: _slideOn ? widget.drawerChild : const SizedBox(),
+                  ),
                 );
               },
             ),
           ),
         ),
         Row(
-          children: <Widget>[
+          children: [
             SlideTransition(
-              position: Tween(begin: Offset(-1, 0), end: Offset.zero)
-                  .animate(CurvedAnimation(
-                curve: Curves.linear,
-                parent: _animationController,
-              )),
+              position: _firstAnimation,
               child: GestureDetector(
                 onPanDown: (details) {
+                  _isDrawerActive = true;
                   _touchPosition = details.globalPosition;
                   setState(() {});
                 },
@@ -122,40 +176,38 @@ class _ElasticDrawerState extends State<ElasticDrawer>
                   _touchPosition = details.globalPosition;
                   setState(() {});
                 },
-                onPanEnd: (details) {
-                  _touchPosition = Offset(size.width - 20.0, size.height / 2);
-                  _animationController.reverse().then((value) => {
-                        setState(() {
-                          _touchPosition = Offset(20.0, size.height / 2);
-                          _slideOn = false;
-                        })
-                      });
+                onPanEnd: (_) {
+                  _animation(context);
                 },
-                child: Container(width: 20.0, color: Colors.transparent),
+                child: Container(width: borderWidth, color: Colors.transparent),
               ),
             ),
-            Spacer(),
+            const Spacer(),
             SlideTransition(
-              position: Tween(begin: Offset.zero, end: Offset(1, 0))
-                  .animate(CurvedAnimation(
-                curve: Curves.linear,
-                parent: _animationController,
-              )),
+              position: _secondAnimation,
               child: GestureDetector(
                 onPanDown: (details) {
                   _slideOn = true;
-                  _touchPosition = details.globalPosition;
+                  _touchPosition = Offset(
+                    details.globalPosition.dx
+                        .clamp(0, size.width - borderWidth),
+                    details.globalPosition.dy,
+                  );
                   setState(() {});
                 },
                 onPanUpdate: (details) {
-                  _touchPosition = details.globalPosition;
+                  _touchPosition = Offset(
+                    details.globalPosition.dx
+                        .clamp(0, size.width - borderWidth),
+                    details.globalPosition.dy,
+                  );
                   setState(() {});
                 },
-                onPanEnd: (details) {
-                  _touchPosition = Offset(0.0, size.height / 2);
+                onPanEnd: (_) {
+                  _touchPosition = Offset(0.0, markPosition);
                   _animationController.forward();
                 },
-                child: Container(width: 20.0, color: Colors.transparent),
+                child: Container(width: borderWidth, color: Colors.transparent),
               ),
             )
           ],
@@ -166,22 +218,48 @@ class _ElasticDrawerState extends State<ElasticDrawer>
 }
 
 class _CustomClipper extends CustomClipper<Path> {
+  final double _endPosition;
+  final double _markPosition;
+  final double _touchWidth;
+  final bool _isDrawerActive;
   Offset? _touchPosition;
-  double _endPosition;
 
-  _CustomClipper(this._touchPosition, this._endPosition);
+  _CustomClipper(
+    this._touchPosition,
+    this._touchWidth,
+    this._markPosition,
+    this._endPosition,
+    this._isDrawerActive,
+  );
 
   @override
   Path getClip(Size size) {
-    if (_touchPosition == null) _touchPosition = Offset(20.0, size.height / 2);
-    Path path = Path();
-    path.moveTo(size.width - 10, 0);
-    path.lineTo(size.width, 0);
-    path.lineTo(size.width, size.height);
-    path.lineTo(size.width - 10 - size.width * _endPosition, size.height);
-    path.cubicTo(_touchPosition!.dx, _touchPosition!.dy, _touchPosition!.dx,
-        _touchPosition!.dy, size.width - 10 - size.width * _endPosition, 0);
-    path.close();
+    _touchPosition ??= Offset(borderWidth, _markPosition);
+    final expandFactor = _touchWidth == 0 || _isDrawerActive
+        ? 1
+        : ((size.width - borderWidth - _touchPosition!.dx) / _touchWidth)
+            .clamp(0, 1);
+    final path = Path()
+      ..moveTo(size.width - lineWidth, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width, size.height)
+      ..lineTo(size.width - lineWidth - size.width * _endPosition, size.height)
+      ..lineTo(
+        size.width - lineWidth - size.width * _endPosition,
+        _touchPosition!.dy +
+            touchRadius +
+            (size.height - _touchPosition!.dy - touchRadius) * expandFactor,
+      )
+      ..cubicTo(
+        _touchPosition!.dx - _touchWidth,
+        _touchPosition!.dy,
+        _touchPosition!.dx - _touchWidth,
+        _touchPosition!.dy,
+        size.width - lineWidth - size.width * _endPosition,
+        (_touchPosition!.dy - touchRadius) * (1 - expandFactor),
+      )
+      ..lineTo(size.width - lineWidth - size.width * _endPosition, 0);
+
     return path;
   }
 

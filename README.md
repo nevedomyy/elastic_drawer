@@ -51,3 +51,11 @@ InkWell(
   },
 )
 ```
+
+Use parameter **markWidth** to set width of touch mark (0..1)
+
+![img](demo3.png)  ![img](demo4.png)
+
+Use parameter **markPosition** to set vertical position of touch mark (0..1)
+
+![img](demo5.png)  ![img](demo6.png)
